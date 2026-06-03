@@ -1,0 +1,11 @@
+@if (isBrowser()) {
+  <ag-grid-angular
+    style="width: 100%;"
+    [rowData]="data"
+    [columnDefs]="headers"
+    [pagination]="true"
+    domLayout="autoHeight"
+    (gridReady)="onGridReady($event)"
+  />
+}
+

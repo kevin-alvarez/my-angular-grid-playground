@@ -1,0 +1,33 @@
+<main>
+  <div class="flex flex-col w-full h-full px-4">
+    <div class="flex justify-around items-center h-1/8">
+      <h1>Grid Page!</h1>
+    </div>
+    <div class="flex justify-around items-center h-1/8">
+      <input class="w-full h-full mx-4 p-2 border-1 rounded" type="text" #skuInputRef placeholder="Enter SKU to search">
+      <button (click)="loadData(skuInputRef.value)" [disabled]="isLoading()" class="m-2 p-2 bg-blue-500 disabled:bg-gray-500 rounded cursor-pointer">Load Data</button>
+    </div>
+    <div class="flex justify-around items-center">
+      @if (errorMessage() !== '') {
+        <div class="text-red-500">{{ errorMessage() }}</div>
+      } 
+    </div>
+    <div class="w-full">
+      @if (isLoading()) {
+        <div class="flex items-center justify-around">
+          <div class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+        </div>
+      } @else {
+        <ag-grid-angular
+          style="width: 100%;"
+          [rowData]="products()"
+          [columnDefs]="columnLabels"
+          [pagination]="true"
+          [paginationPageSize]="20"
+          domLayout="autoHeight"
+          (gridReady)="onGridReady($event)"
+        />
+      }
+    </div>
+  </div>
+</main>
