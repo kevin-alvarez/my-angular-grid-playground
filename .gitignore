@@ -1,0 +1,7 @@
+# Angular
+angular-grid-test/node_modules
+angular-grid-test/.angular
+angular-grid-test/.vscode
+
+# Express
+api-dummy/node_modules
