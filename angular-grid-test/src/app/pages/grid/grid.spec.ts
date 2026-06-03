@@ -5,6 +5,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+import { Observable } from 'rxjs';
 import type { Product } from './models/product.model';
 
 describe('Grid', () => {
@@ -20,7 +21,12 @@ describe('Grid', () => {
 
   const createMockService = () => ({
     getProducts: vi.fn((skus: string[]) =>
-      Promise.resolve(mockProducts.filter(p => skus.includes(p.sku)))
+      new Observable<Product[]>((subscriber) => {
+        setTimeout(() => {
+          subscriber.next(mockProducts.filter(p => skus.includes(p.sku)));
+          subscriber.complete();
+        }, 100);
+      })
     ),
   });
 
@@ -43,7 +49,7 @@ describe('Grid', () => {
 
   describe('initial state', () => {
     it('should have empty products', () => {
-      expect((component as any).products).toEqual([]);
+      expect(component.products()).toEqual([]);
     });
 
     it('should have isLoading initially false', () => {
@@ -120,7 +126,7 @@ describe('Grid', () => {
     it('should filter products by a single SKU', async () => {
       component.loadData('POL-ROJ-001');
       await vi.advanceTimersByTimeAsync(2000);
-      const products = (component as any).products;
+      const products = component.products();
       expect(products.length).toBe(1);
       expect(products[0].sku).toBe('POL-ROJ-001');
     });
@@ -128,7 +134,7 @@ describe('Grid', () => {
     it('should filter products by multiple comma-separated SKUs', async () => {
       component.loadData('POL-ROJ-001,POL-AZU-001');
       await vi.advanceTimersByTimeAsync(2000);
-      const products = (component as any).products;
+      const products = component.products();
       expect(products.length).toBe(2);
       expect(products.map((p: Product) => p.sku)).toEqual(['POL-ROJ-001', 'POL-AZU-001']);
     });
@@ -136,13 +142,13 @@ describe('Grid', () => {
     it('should return empty array for non-matching SKU', async () => {
       component.loadData('NON-EXISTENT');
       await vi.advanceTimersByTimeAsync(2000);
-      expect((component as any).products.length).toBe(0);
+      expect(component.products().length).toBe(0);
     });
 
     it('should return empty array for empty string input (no SKUs to filter)', async () => {
       component.loadData('');
       await vi.advanceTimersByTimeAsync(2000);
-      expect((component as any).products.length).toBe(0);
+      expect(component.products().length).toBe(0);
     });
 
     it('should pass whitespace-preserved SKUs to service (split does not trim)', async () => {
